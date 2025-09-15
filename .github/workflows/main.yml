@@ -1,8 +1,60 @@
-name: hello-world
-on: push
+name: Laravel CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
-  my-job:
+  build-and-test:
     runs-on: ubuntu-latest
+
     steps:
-      - name: my-step
-        run: echo "Hello World!"
+      # 1. Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Setup PHP environment
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, bcmath, curl, mysql
+
+      # 3. Install Composer dependencies
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
+
+      # 4. Setup environment file for testing
+      - name: Setup .env
+        run: cp .env.example .env
+
+      # 5. Generate Laravel app key
+      - name: Generate App Key
+        run: php artisan key:generate
+
+      # 6. Run test suite
+      - name: Run Tests
+        run: php artisan test
+
+      # 7. (Optional - uncomment later for deployment)
+      # - name: Deploy to server via SSH
+      #   uses: appleboy/ssh-action@v0.1.6
+      #   with:
+      #     host: ${{ secrets.SERVER_HOST }}
+      #     username: ${{ secrets.SERVER_USER }}
+      #     key: ${{ secrets.SERVER_SSH_KEY }}
+      #     port: ${{ secrets.SERVER_PORT }}
+      #     script: |
+      #       cd ${{ secrets.DEPLOY_DIR }}
+      #       git reset --hard
+      #       git pull origin main
+      #       composer install --no-dev --optimize-autoloader
+      #       php artisan migrate --force
+      #       php artisan config:cache
+      #       php artisan route:cache
+      #       php artisan view:cache
+      #       php artisan cache:clear
