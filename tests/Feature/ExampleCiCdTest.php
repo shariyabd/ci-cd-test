@@ -17,4 +17,10 @@ class ExampleCiCdTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_home_route_loads_controller()
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+    }
 }
