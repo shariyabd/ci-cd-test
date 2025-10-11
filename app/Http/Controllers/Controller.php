@@ -10,6 +10,6 @@ abstract class Controller
     }
     public function index()
     {
-        return "Hello, World!"
+        return "Hello, World!";
     }
 }
